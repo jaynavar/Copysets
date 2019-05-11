@@ -67,18 +67,11 @@ def generateDiagram(schemeNames, data, groupSize=None):
       print ''
 
 def generateFigure6(schemeNames, data):
-   # TODO: generate Figure 6 plot
-   # TODO: use the scheme names to generate the figure key in correct order
-
-   # filter data to only every 1,000 points
-   for key in data.iterkeys():
-      data[key] = [(0, 0)] + [(numNodes, prob) for numNodes, prob in data[key]
-                              if numNodes % 1000 == 0]
-
    # add data
    for key, schemeName in schemeNames:
       x, y = zip(*data[key])
-      plt.plot(x, y, label=schemeName, linestyle='dashed', marker='o')
+      plt.plot(x, y, label=schemeName, linestyle='dashed',
+               marker='o', markevery=1000)
 
    # add legend
    plt.legend()
