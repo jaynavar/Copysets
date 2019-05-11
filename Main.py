@@ -69,6 +69,8 @@ def generateDiagram(schemeNames, data, groupSize=None):
 def generateFigure6(schemeNames, data):
    # TODO: generate Figure 6 plot
    # TODO: use the scheme names to generate the figure key in correct order
+
+   # add data
    plt.plot([0.1, 0.2, 0.3, 0.4, 0.9, 1.0])
 
    # set x-axis
@@ -76,9 +78,10 @@ def generateFigure6(schemeNames, data):
 
    # set y-axis
    plt.ylabel('Probability of data loss')
-   plt.yticks(np.arange(0.0, 1.0 + 0.1, 0.2))
+   yticksRange = np.arange(0.0, 1.0 + 0.1, 0.2)
+   plt.yticks(yticksRange)
    ax = plt.gca()
-   ax.set_yticklabels(['{:,.0%}'.format(x) for x in [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]])
+   ax.set_yticklabels(['{:,.0%}'.format(tick) for tick in yticksRange])
 
    # save figure
    plt.savefig('Figure6.png')
