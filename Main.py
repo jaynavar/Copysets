@@ -7,19 +7,21 @@ import numpy as np
 import Ramcloud
 
 DEBUG = False
+GROUP_SIZE = 300
 
 def runFigure6Experiment(rf=3, maxNodes=10000):
    # can't have less than replication factor number of nodes
    minNodes = rf
 
    # gather the data from the replication schemes
+   replicationKwargs = {'debug': DEBUG, 'replicationFactor': 3}
    replicationSchemes = [
-      Hdfs.HdfsRandomScheme(debug=DEBUG),
-      Ramcloud.RamcloudRandomScheme(debug=DEBUG),
-      Facebook.FacebookRandomScheme(debug=DEBUG),
-      Hdfs.HdfsCopysetScheme(debug=DEBUG),
-      Ramcloud.RamcloudCopysetScheme(debug=DEBUG),
-      Facebook.FacebookCopysetScheme(debug=DEBUG),
+      Hdfs.HdfsRandomScheme(**replicationKwargs),
+      Ramcloud.RamcloudRandomScheme(**replicationKwargs),
+      Facebook.FacebookRandomScheme(**replicationKwargs),
+      Hdfs.HdfsCopysetScheme(**replicationKwargs),
+      Ramcloud.RamcloudCopysetScheme(**replicationKwargs),
+      Facebook.FacebookCopysetScheme(**replicationKwargs),
    ]
    data = {}
    for scheme in replicationSchemes:
@@ -31,11 +33,13 @@ def runFigure6Experiment(rf=3, maxNodes=10000):
    # generate the figure
    schemeNames = [(type(scheme).__name__, scheme.name())
                   for scheme in replicationSchemes]
-   if DEBUG:
-      generateDiagram(schemeNames, data)
+
+   generateDiagram(schemeNames, data)
    generateFigure6(schemeNames, data)
 
-def generateDiagram(schemeNames, data, groupSize=500):
+def generateDiagram(schemeNames, data, groupSize=None):
+   if groupSize is None:
+      groupSize = GROUP_SIZE
    def outputDataPoints(dataPoints):
       # output stats for the group
       firstN = dataPoints[0][0]
@@ -69,8 +73,11 @@ if __name__ == '__main__':
    parser = argparse.ArgumentParser()
    parser.add_argument('-d', '--debug', action='store_true',
                        help='enable debugging output')
+   parser.add_argument('-g', '--groupSize', default='500',
+                       help='size of debug summary groups')
    args = parser.parse_args()
 
    DEBUG = args.debug
+   GROUP_SIZE = int(args.groupSize)
 
    runFigure6Experiment()
