@@ -79,7 +79,9 @@ def generateFigure6(schemeNames, data):
    # add data
    for key, schemeName in schemeNames:
       x, y = zip(*data[key])
-      xNew = np.linspace(min(x), max(x), 500)
+      x = np.array(x)
+      y = np.array(y)
+      xNew = np.linspace(x.min(), x.max(), 500)
       interpFunc = interp1d(x, y, kind='quadratic')
       ySmooth= interpFunc(xNew)
       plt.plot(xNew, ySmooth, label=schemeName, linestyle='dashed', marker='o')
