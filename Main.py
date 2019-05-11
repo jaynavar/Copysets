@@ -71,7 +71,9 @@ def generateFigure6(schemeNames, data):
    # TODO: use the scheme names to generate the figure key in correct order
 
    # add data
-   plt.plot([0.1, 0.2, 0.3, 0.4, 0.9, 1.0])
+   for key, schemeName in schemeNames:
+      x, y = zip(*data[key])
+      plt.plot(x, y)
 
    # set x-axis
    plt.xlabel('Number of nodes')
