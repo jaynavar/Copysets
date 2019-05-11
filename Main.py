@@ -69,9 +69,17 @@ def generateDiagram(schemeNames, data, groupSize=None):
 def generateFigure6(schemeNames, data):
    # TODO: generate Figure 6 plot
    # TODO: use the scheme names to generate the figure key in correct order
-   plt.plot([1,2,3,4])
+   plt.plot([0.1, 0.2, 0.3, 0.4, 0.9])
+
+   # set x-axis
    plt.xlabel('Number of nodes')
+
+   # set y-axis
    plt.ylabel('Probability of data loss')
+   ax = plt.gca()
+   ax.set_yticklabels(['{:,.2%}'.format(x) for x in [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]])
+
+   # save figure
    plt.savefig('Figure6.png')
 
 if __name__ == '__main__':
