@@ -12,13 +12,16 @@ class FacebookRandomScheme(FacebookScheme):
       # TODO
       return 0
 
-   def name(self):
-      return 'Facebook, Random Replication'
+   def plotInfo(self):
+      return Replication.PlotInfo('Facebook, Random Replication',
+                                  linestyle='-.', marker='o', markersize=10,
+                                  color='lime')
 
 class FacebookCopysetScheme(FacebookScheme):
    def probabilityOfDataLoss(self, numNodes):
       # TODO
       return 0
 
-   def name(self):
-      return 'Facebook, Copyset Replication'
+   def plotInfo(self):
+      return Replication.PlotInfo('Facebook, Copyset Replication',
+                                  linestyle='-.', marker='s', color='fuchsia')

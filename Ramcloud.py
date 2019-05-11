@@ -12,8 +12,9 @@ class RamcloudRandomScheme(RamcloudScheme):
       return self.randomReplicationDataLoss(
          numNodes, self.chunksPerNode, self.replicationFactor)
 
-   def name(self):
-      return 'RAMCloud, Random Replication'
+   def plotInfo(self):
+      return Replication.PlotInfo('RAMCloud, Random Replication',
+                                  linestyle='--', marker='s', color='blue')
 
 class RamcloudCopysetScheme(RamcloudScheme):
    def probabilityOfDataLoss(self, numNodes):
@@ -26,5 +27,7 @@ class RamcloudCopysetScheme(RamcloudScheme):
       return self.copysetReplicationDataLoss(
          numNodes, self.chunksPerNode, self.replicationFactor, scatterWidth)
 
-   def name(self):
-      return 'RAMCloud, Copyset Replication'
+   def plotInfo(self):
+      return Replication.PlotInfo('RAMCloud, Copyset Replication',
+                                  linestyle='--', marker='o', markersize=10,
+                                  color='maroon')

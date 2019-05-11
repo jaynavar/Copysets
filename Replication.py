@@ -8,7 +8,7 @@ class ReplicationScheme(object):
    def probabilityOfDataLoss(self, numNodes):
       raise NotImplementedError
 
-   def name(self):
+   def plotInfo(self):
       raise NotImplementedError
 
    @staticmethod
@@ -35,3 +35,17 @@ class ReplicationScheme(object):
       probOfDataLoss = 1.0 - (1.0 - numCopysets / totalCopysets) ** failedCombos
 
       return probOfDataLoss
+
+class PlotInfo(object):
+   def __init__(self, label, linestyle='-', linewidth=4, marker='o',
+                markevery=1000, markersize=8, markeredgewidth=0.0,
+                color='blue', clip_on=False):
+      self.label = label
+      self.linestyle = linestyle
+      self.linewidth = linewidth
+      self.marker = marker
+      self.markevery = markevery
+      self.markersize = markersize
+      self.markeredgewidth = markeredgewidth
+      self.color = color
+      self.clip_on = clip_on

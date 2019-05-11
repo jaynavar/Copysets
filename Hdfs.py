@@ -12,13 +12,15 @@ class HdfsRandomScheme(HdfsScheme):
       return self.randomReplicationDataLoss(
          numNodes, self.chunksPerNode, self.replicationFactor)
 
-   def name(self):
-      return 'HDFS, Random Replication'
+   def plotInfo(self):
+      return Replication.PlotInfo('HDFS, Random Replication',
+                                  linestyle='-', marker='D', color='red')
 
 class HdfsCopysetScheme(HdfsScheme):
    def probabilityOfDataLoss(self, numNodes):
       return self.copysetReplicationDataLoss(
          numNodes, self.chunksPerNode, self.replicationFactor, self.scatterWidth)
 
-   def name(self):
-      return 'HDFS, Copyset Replication'
+   def plotInfo(self):
+      return Replication.PlotInfo('HDFS, Copyset Replication',
+                                  linestyle='-', marker='D', color='aqua')
