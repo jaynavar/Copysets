@@ -79,7 +79,6 @@ def generateFigure6(schemeNames, data):
    for key, schemeName in schemeNames:
       x, y = zip(*data[key])
       plt.plot(x, y, label=schemeName, linestyle='dashed', marker='o')
-      plt.scatter(x, y)
 
    # add legend
    plt.legend()
