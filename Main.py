@@ -73,7 +73,7 @@ def generateFigure6(schemeNames, data):
    # add data
    for key, schemeName in schemeNames:
       x, y = zip(*data[key])
-      plt.plot(x, y)
+      plt.plot(x, y, label=schemeName, linestyle='dashed')
 
    # set x-axis
    plt.xlabel('Number of nodes')
