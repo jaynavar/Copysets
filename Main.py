@@ -7,6 +7,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import Ramcloud
+from scipy.interpolate import interp1d
 
 DEBUG = False
 GROUP_SIZE = 300
@@ -72,13 +73,16 @@ def generateFigure6(schemeNames, data):
 
    # filter data to only every 1,000 points
    for key in data.iterkeys():
-      data[key] = [(numNodes, prob) for numNodes, prob in data[key]
-                   if numNodes % 1000 == 0]
+      data[key] = [(0, 0)] + [(numNodes, prob) for numNodes, prob in data[key]
+                              if numNodes % 1000 == 0]
 
    # add data
    for key, schemeName in schemeNames:
       x, y = zip(*data[key])
-      plt.plot(x, y, label=schemeName, linestyle='dashed', marker='o')
+      xNew = np.linspace(min(x), max(x), 500)
+      interpFunc = interp1d(x, y, kind='quadratic')
+      ySmooth= interpFunc(xNew)
+      plt.plot(xNew, ySmooth, label=schemeName, linestyle='dashed', marker='o')
 
    # add legend
    plt.legend()
