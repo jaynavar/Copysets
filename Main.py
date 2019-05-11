@@ -3,6 +3,8 @@ import argparse
 import Facebook
 import Hdfs
 import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 import numpy as np
 import Ramcloud
 
@@ -67,7 +69,10 @@ def generateDiagram(schemeNames, data, groupSize=None):
 def generateFigure6(schemeNames, data):
    # TODO: generate Figure 6 plot
    # TODO: use the scheme names to generate the figure key in correct order
-   pass
+   plt.plot([1,2,3,4])
+   plt.xlabel('Number of nodes')
+   plt.ylabel('Probability of data loss')
+   plt.savefig('Figure6.png')
 
 if __name__ == '__main__':
    parser = argparse.ArgumentParser()
