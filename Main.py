@@ -83,6 +83,7 @@ def generateFigure6(schemeNames, data):
       interpFunc = interp1d(x, y, kind='quadratic')
       ySmooth= interpFunc(xNew)
       plt.plot(xNew, ySmooth, label=schemeName, linestyle='dashed', marker='o')
+      plt.scatter(x, y)
 
    # add legend
    plt.legend()
