@@ -7,7 +7,6 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import Ramcloud
-from scipy.interpolate import interp1d
 
 DEBUG = False
 GROUP_SIZE = 300
@@ -79,12 +78,7 @@ def generateFigure6(schemeNames, data):
    # add data
    for key, schemeName in schemeNames:
       x, y = zip(*data[key])
-      x = np.array(x)
-      y = np.array(y)
-      xNew = np.linspace(x.min(), x.max(), 500)
-      interpFunc = interp1d(x, y, kind='quadratic')
-      ySmooth= interpFunc(xNew)
-      plt.plot(xNew, ySmooth, label=schemeName, linestyle='dashed', marker='o')
+      plt.plot(x, y, label=schemeName, linestyle='dashed', marker='o')
       plt.scatter(x, y)
 
    # add legend
