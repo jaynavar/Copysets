@@ -76,7 +76,7 @@ def generateFigure6(schemeNames, data):
 
    # set y-axis
    plt.ylabel('Probability of data loss')
-   plt.yticks(np.arange(0.0, 1.0, 0.2))
+   plt.yticks(np.arange(0.0, 1.0 + 0.1, 0.2))
    ax = plt.gca()
    ax.set_yticklabels(['{:,.0%}'.format(x) for x in [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]])
 
