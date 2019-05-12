@@ -6,6 +6,11 @@ class RamcloudScheme(Replication.ReplicationScheme):
       super(RamcloudScheme, self).__init__(*args, **kwargs)
 
       self.chunksPerNode = 8000
+      # comes from S = P (R - 1)
+      #  S: scatter width
+      #  P: number of permutations (fixed at 1)
+      #  R: replication factor
+      self.scatterWidth = self.replicationFactor - 1
 
 class RamcloudRandomScheme(RamcloudScheme):
    def probabilityOfDataLoss(self, numNodes):
@@ -18,14 +23,8 @@ class RamcloudRandomScheme(RamcloudScheme):
 
 class RamcloudCopysetScheme(RamcloudScheme):
    def probabilityOfDataLoss(self, numNodes):
-      # comes from S = P (R - 1)
-      #  S: scatter width
-      #  P: number of permutations (fixed at 1)
-      #  R: replication factor
-      scatterWidth = self.replicationFactor - 1
-
       return self.copysetReplicationDataLoss(
-         numNodes, self.chunksPerNode, self.replicationFactor, scatterWidth)
+         numNodes, self.chunksPerNode, self.replicationFactor, self.scatterWidth)
 
    def plotInfo(self):
       return Replication.PlotInfo('RAMCloud, Copyset Replication',
