@@ -71,8 +71,9 @@ def generateDiagram(schemePlotInfos, data, groupSize=None):
       print ''
 
 def generateFigure6(schemePlotInfos, data):
-   # set dimensions
-   plt.figure(figsize=(8, 5))
+   # set dimensions and title
+   fig = plt.figure(figsize=(8, 5))
+   fig.suptitle('Probability of data loss when 1% of the nodes fail concurrently')
 
    # add data
    for key, schemePlotInfo in schemePlotInfos:
