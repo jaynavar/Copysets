@@ -18,8 +18,7 @@ class ReplicationScheme(object):
       failedCombos = scipy.misc.comb(numFailedNodes, replicationFactor)
       totalCombos = scipy.misc.comb(numNodes, replicationFactor)
       probOfLosingChunk = failedCombos / totalCombos
-      numChunks = numNodes * chunksPerNode
-      probOfDataLoss = 1.0 - (1.0 - probOfLosingChunk) ** (numNodes * numChunks)
+      probOfDataLoss = 1.0 - (1.0 - probOfLosingChunk) ** (numNodes * chunksPerNode)
 
       return probOfDataLoss
 
