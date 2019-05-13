@@ -70,6 +70,7 @@ def generateDiagram(schemePlotInfos, data, groupSize=None):
          outputDataPoints(dataPoints)
       print ''
 
+<<<<<<< HEAD
 def generateFigure6(schemePlotInfos, data):
    # set dimensions and title
    fig = plt.figure(figsize=(8, 5))
@@ -87,6 +88,17 @@ def generateFigure6(schemePlotInfos, data):
 
    # add legend
    plt.legend(numpoints=1, handlelength=0.5, borderaxespad=1.0)
+=======
+def generateFigure6(schemeNames, data):
+   # add data
+   for key, schemeName in schemeNames:
+      x, y = zip(*data[key])
+      plt.plot(x, y, label=schemeName, linestyle='dashed',
+               marker='o', markevery=1000)
+
+   # add legend
+   plt.legend()
+>>>>>>> master
 
    # set x-axis
    plt.xlabel('Number of nodes')
