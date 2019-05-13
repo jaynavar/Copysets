@@ -29,7 +29,7 @@ class ReplicationScheme(object):
       numFailedNodes = 0.01 * numNodes
       failedCombos = scipy.misc.comb(numFailedNodes, replicationFactor)
       totalCopysets = scipy.misc.comb(numNodes, replicationFactor)
-      numCopysets = ((scatterWidth / (replicationFactor - 1)) * numNodes /
+      numCopysets = (((scatterWidth + 1) / (replicationFactor - 1)) * numNodes /
                      replicationFactor)
       probOfDataLoss = 1.0 - (1.0 - numCopysets / totalCopysets) ** failedCombos
 
