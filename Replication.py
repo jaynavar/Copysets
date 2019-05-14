@@ -1,3 +1,4 @@
+import itertools as it
 import numpy as np
 import random
 import scipy.misc
@@ -62,18 +63,24 @@ class ReplicationScheme(object):
       totalChunks = int(0.8 * chunksPerNode * numNodes / replicationFactor)
       nodes = range(numNodes)
 
+      # replicate chunks across the cluster, generating a copyset for each chunk
+      copysets = set()
+      for chunk in range(totalChunks):
+         copysets.add(chunkReplicationFunc())
+
       # compute 1% of nodes that will fail
       failedNodes = set(random.sample(nodes, int(0.01 * numNodes)))
 
-      # replicate chunks across the cluster, generating a copyset for each chunk.
-      # if generated copyset contains all failed nodes, we will lose data.
-      for chunk in range(totalChunks):
-         if (sum([1 for node in chunkReplicationFunc() if node in failedNodes]) ==
-             replicationFactor):
-            # we lost data, so return data loss probability of 1.0
-            return 1.0
-      # we did not lose data, so return data loss probability of 0.0
-      return 0.0
+      # determine if failed nodes form a copyset that is replicated to
+      lostData = not copysets.isdisjoint(
+         it.combinations(failedNodes, replicationFactor))
+
+      if lostData:
+         # we lost data, so return data loss probability of 1.0
+         return 1.0
+      else:
+         # we did not lose data, so return data loss probability of 0.0
+         return 0.0
 
    @staticmethod
    def generateRandomReplicationFunc(numNodes, chunksPerNode, replicationFactor,
@@ -103,8 +110,8 @@ class ReplicationScheme(object):
             if len(buddiesWithRoom) < replicationFactor - 1:
                # no eligible buddies for this primary
                continue
-            copyset = [primary] + random.sample(buddiesWithRoom,
-                                                replicationFactor - 1)
+            copyset = tuple(
+               [primary] + random.sample(buddiesWithRoom, replicationFactor - 1))
 
             # decrement the capacities for each replica
             decrementCapacities(copyset)
@@ -112,7 +119,7 @@ class ReplicationScheme(object):
             return copyset
 
       def simpleChunkReplicationFunc():
-         copyset = random.sample(capacities.keys(), replicationFactor)
+         copyset = tuple(random.sample(capacities.keys(), replicationFactor))
          # decrement the capacities for each replica
          decrementCapacities(copyset)
          return copyset
