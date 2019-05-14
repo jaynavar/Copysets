@@ -64,11 +64,11 @@ class ReplicationScheme(object):
       nodes = range(numNodes)
 
       # replicate chunks across the cluster, generating a copyset for each chunk
-      copysets = set([chunkReplicationFunc()
+      copysets = set([tuple(sorted(chunkReplicationFunc()))
                       for _ in range(totalChunks)])
 
       # compute 1% of nodes that will fail
-      failedNodes = set(random.sample(nodes, int(0.01 * numNodes)))
+      failedNodes = sorted(random.sample(nodes, int(0.01 * numNodes)))
 
       # determine if failed nodes form a copyset that is replicated to
       lostData = not copysets.isdisjoint(
@@ -109,8 +109,8 @@ class ReplicationScheme(object):
             if len(buddiesWithRoom) < replicationFactor - 1:
                # no eligible buddies for this primary
                continue
-            copyset = tuple(
-               [primary] + random.sample(buddiesWithRoom, replicationFactor - 1))
+            copyset = ([primary] +
+                       random.sample(buddiesWithRoom, replicationFactor - 1))
 
             # decrement the capacities for each replica
             decrementCapacities(copyset)
@@ -118,7 +118,7 @@ class ReplicationScheme(object):
             return copyset
 
       def simpleChunkReplicationFunc():
-         copyset = tuple(random.sample(capacities.keys(), replicationFactor))
+         copyset = random.sample(capacities.keys(), replicationFactor)
          # decrement the capacities for each replica
          decrementCapacities(copyset)
          return copyset
