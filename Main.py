@@ -11,13 +11,13 @@ import Ramcloud
 DEBUG = False
 GROUP_SIZE = 300
 
-def runFigure6Experiment(rf=3, maxNodes=10000, simulation=False):
+def runFigure6Experiment(rf=3, maxNodes=10000, simulation=False, trials=100):
    # can't have less than replication factor number of nodes
    minNodes = rf
 
    # gather the data from the replication schemes
    replicationKwargs = {'debug': DEBUG, 'simulation': simulation,
-                        'replicationFactor': 3}
+                        'trials': trials, 'replicationFactor': 3}
    replicationSchemes = [
       Hdfs.HdfsRandomScheme(**replicationKwargs),
       Ramcloud.RamcloudRandomScheme(**replicationKwargs),
@@ -113,9 +113,11 @@ if __name__ == '__main__':
                        help='size of debug summary groups')
    parser.add_argument('-s', '--simulation', action='store_true',
                        help='use simulation instead of computation')
+   parser.add_argument('-n', default='100',
+                       help='number of simulation trials to run per datapoint')
    args = parser.parse_args()
 
    DEBUG = args.debug
    GROUP_SIZE = int(args.groupSize)
 
-   runFigure6Experiment(simulation=args.simulation)
+   runFigure6Experiment(simulation=args.simulation, trials=int(args.n))
