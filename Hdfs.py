@@ -8,7 +8,11 @@ class HdfsScheme(Replication.ReplicationScheme):
       self.scatterWidth = 200
 
 class HdfsRandomScheme(HdfsScheme):
-   def probabilityOfDataLoss(self, numNodes):
+   def probabilityOfDataLossSimulation(self, numNodes):
+      # TODO
+      return 0
+
+   def probabilityOfDataLossComputation(self, numNodes):
       return self.randomReplicationDataLoss(
          numNodes, self.chunksPerNode, self.replicationFactor)
 
@@ -17,7 +21,11 @@ class HdfsRandomScheme(HdfsScheme):
                                   linestyle='-', marker='D', color='red')
 
 class HdfsCopysetScheme(HdfsScheme):
-   def probabilityOfDataLoss(self, numNodes):
+   def probabilityOfDataLossSimulation(self, numNodes):
+      # TODO
+      return 0
+
+   def probabilityOfDataLossComputation(self, numNodes):
       return self.copysetReplicationDataLoss(
          numNodes, self.chunksPerNode, self.replicationFactor, self.scatterWidth)
 

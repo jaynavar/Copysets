@@ -1,11 +1,21 @@
 import scipy.misc
 
 class ReplicationScheme(object):
-   def __init__(self, debug=False, replicationFactor=3):
+   def __init__(self, debug=False, simulation=False, replicationFactor=3):
       self.debug = debug
+      self.simulation = simulation
       self.replicationFactor = replicationFactor
 
    def probabilityOfDataLoss(self, numNodes):
+      if self.simulation:
+         return self.probabilityOfDataLossSimulation(numNodes)
+      else:
+         return self.probabilityOfDataLossComputation(numNodes)
+
+   def probabilityOfDataLossSimulation(self, numNodes):
+      raise NotImplementedError
+
+   def probabilityOfDataLossComputation(self, numNodes):
       raise NotImplementedError
 
    def plotInfo(self):

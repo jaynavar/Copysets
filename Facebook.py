@@ -9,7 +9,11 @@ class FacebookScheme(Replication.ReplicationScheme):
       self.scatterWidth = 10
 
 class FacebookRandomScheme(FacebookScheme):
-   def probabilityOfDataLoss(self, numNodes):
+   def probabilityOfDataLossSimulation(self, numNodes):
+      # TODO
+      return 0
+
+   def probabilityOfDataLossComputation(self, numNodes):
       # compute the probability
       numFailedNodes = 0.01 * numNodes
       failedCombos = scipy.misc.comb(numFailedNodes, self.replicationFactor)
@@ -27,7 +31,11 @@ class FacebookRandomScheme(FacebookScheme):
                                   color='lime')
 
 class FacebookCopysetScheme(FacebookScheme):
-   def probabilityOfDataLoss(self, numNodes):
+   def probabilityOfDataLossSimulation(self, numNodes):
+      # TODO
+      return 0
+
+   def probabilityOfDataLossComputation(self, numNodes):
       return self.copysetReplicationDataLoss(
          numNodes, self.chunksPerNode, self.replicationFactor, self.scatterWidth)
 

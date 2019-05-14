@@ -13,7 +13,11 @@ class RamcloudScheme(Replication.ReplicationScheme):
       self.scatterWidth = self.replicationFactor - 1
 
 class RamcloudRandomScheme(RamcloudScheme):
-   def probabilityOfDataLoss(self, numNodes):
+   def probabilityOfDataLossSimulation(self, numNodes):
+      # TODO
+      return 0
+
+   def probabilityOfDataLossComputation(self, numNodes):
       return self.randomReplicationDataLoss(
          numNodes, self.chunksPerNode, self.replicationFactor)
 
@@ -22,7 +26,11 @@ class RamcloudRandomScheme(RamcloudScheme):
                                   linestyle='--', marker='s', color='blue')
 
 class RamcloudCopysetScheme(RamcloudScheme):
-   def probabilityOfDataLoss(self, numNodes):
+   def probabilityOfDataLossSimulation(self, numNodes):
+      # TODO
+      return 0
+
+   def probabilityOfDataLossComputation(self, numNodes):
       return self.copysetReplicationDataLoss(
          numNodes, self.chunksPerNode, self.replicationFactor, self.scatterWidth)
 
