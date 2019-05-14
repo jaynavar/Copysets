@@ -64,9 +64,8 @@ class ReplicationScheme(object):
       nodes = range(numNodes)
 
       # replicate chunks across the cluster, generating a copyset for each chunk
-      copysets = set()
-      for chunk in range(totalChunks):
-         copysets.add(chunkReplicationFunc())
+      copysets = set([chunkReplicationFunc()
+                      for _ in range(totalChunks)])
 
       # compute 1% of nodes that will fail
       failedNodes = set(random.sample(nodes, int(0.01 * numNodes)))
