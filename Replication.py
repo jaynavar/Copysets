@@ -85,6 +85,13 @@ class ReplicationScheme(object):
       buddies = {nodeId: random.sample(nodes - {nodeId}, scatterWidth)
                  for nodeId in nodes}
 
+      def decrementCapacities(nodes):
+         for node in nodes:
+            capacities[node] -= 1
+            if capacities[node] == 0:
+               # remove the node if it is out of room
+               del capacities[node]
+
       def chunkReplicationFunc():
          while True:
             # choose primary replica from nodes with capacity
@@ -100,15 +107,20 @@ class ReplicationScheme(object):
                                                 replicationFactor - 1)
 
             # decrement the capacities for each replica
-            for replica in copyset:
-               capacities[replica] -= 1
-               if capacities[replica] == 0:
-                  # remove the node if it is out of room
-                  del capacities[replica]
+            decrementCapacities(copyset)
 
             return copyset
 
-      return chunkReplicationFunc
+      def simpleChunkReplicationFunc():
+         copyset = random.sample(capacities.keys(), replicationFactor)
+         # decrement the capacities for each replica
+         decrementCapacities(copyset)
+         return copyset
+
+      if scatterWidth < numNodes - 1:
+         return chunkReplicationFunc
+      else:
+         return simpleChunkReplicationFunc
 
 class PlotInfo(object):
    def __init__(self, label, linestyle='-', linewidth=4, marker='o',
