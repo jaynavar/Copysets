@@ -41,7 +41,7 @@ def runFigure6Experiment(rf=3, maxNodes=10000, simulation=False):
                        for scheme in replicationSchemes]
 
    generateDiagram(schemePlotInfos, data)
-   generateFigure6(schemePlotInfos, data)
+   generateFigure6(schemePlotInfos, data, simulation=simulation)
 
 def generateDiagram(schemePlotInfos, data, groupSize=None):
    if groupSize is None:
@@ -71,7 +71,7 @@ def generateDiagram(schemePlotInfos, data, groupSize=None):
          outputDataPoints(dataPoints)
       print ''
 
-def generateFigure6(schemePlotInfos, data):
+def generateFigure6(schemePlotInfos, data, simulation=False):
    # set dimensions and title
    fig = plt.figure(figsize=(8, 5))
    fig.suptitle('Probability of data loss when 1% of the nodes fail concurrently')
@@ -100,7 +100,10 @@ def generateFigure6(schemePlotInfos, data):
    ax.set_yticklabels(['{:,.0%}'.format(tick) for tick in yticksRange])
 
    # save figure
-   plt.savefig('Figure6.png')
+   if simulation:
+      plt.savefig('Figure6_simulation.png')
+   else:
+      plt.savefig('Figure6_computation.png')
 
 if __name__ == '__main__':
    parser = argparse.ArgumentParser()
