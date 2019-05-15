@@ -56,23 +56,16 @@ class ReplicationScheme(object):
       return probOfDataLoss
 
    @staticmethod
-   def totalChunks(numNodes, chunksPerNode, replicationFactor):
-      roughChunks = int(0.8 * chunksPerNode * numNodes / replicationFactor)
-      # round to multiple of numNodes, makes dividing easier
-      totalChunks = int(numNodes * round(float(roughChunks) / numNodes))
-      return totalChunks
-
-   @staticmethod
    def simulationDataLoss(numNodes, chunksPerNode, replicationFactor,
-                          copysetsFunc):
+                          chunkReplicationFunc):
       # setup other parameters, we only have cluster at 80% load to avoid
       # failed replication due to insufficient space on nodes' buddies
-      totalChunks = ReplicationScheme.totalChunks(numNodes, chunksPerNode,
-                                                  replicationFactor)
+      totalChunks = int(0.8 * chunksPerNode * numNodes / replicationFactor)
       nodes = range(numNodes)
 
-      # get the copysets for the given replication scheme
-      copysets = copysetsFunc()
+      # replicate chunks across the cluster, generating a copyset for each chunk
+      copysets = set([tuple(sorted(chunkReplicationFunc()))
+                      for _ in range(totalChunks)])
 
       # compute 1% of nodes that will fail
       failedNodes = sorted(random.sample(nodes, int(0.01 * numNodes)))
@@ -91,25 +84,49 @@ class ReplicationScheme(object):
    @staticmethod
    def generateRandomReplicationFunc(numNodes, chunksPerNode, replicationFactor,
                                      scatterWidth):
-      totalChunks = ReplicationScheme.totalChunks(numNodes, chunksPerNode,
-                                                  replicationFactor)
       nodes = set(range(numNodes))
+      # node capacities map
+      capacities = {nodeId: chunksPerNode for nodeId in nodes}
       # generate buddy groups for each node
       buddies = {nodeId: random.sample(nodes - {nodeId}, scatterWidth)
                  for nodeId in nodes}
-      # number of chunks that each node is primary for
-      primarySize = int(totalChunks / numNodes)
-      # create map of node to chunks it's primary for
-      primaryChunks = {nodeId: xrange(nodeId * primarySize,
-                                      (nodeId + 1) * primarySize)
-                       for nodeId in nodes}
 
-      def copysetsFunc():
-         # for each node, map its primary chunks to buddy nodes,
-         # each generating a copyset
-         
+      def decrementCapacities(nodes):
+         for node in nodes:
+            capacities[node] -= 1
+            if capacities[node] == 0:
+               # remove the node if it is out of room
+               del capacities[node]
 
-      return copysetsFunc
+      def chunkReplicationFunc():
+         while True:
+            # choose primary replica from nodes with capacity
+            primary = random.choice(capacities.keys())
+
+            # choose secondary replicas from the buddy group
+            buddiesWithRoom = [buddy for buddy in buddies[primary]
+                               if buddy in capacities]
+            if len(buddiesWithRoom) < replicationFactor - 1:
+               # no eligible buddies for this primary
+               continue
+            copyset = ([primary] +
+                       random.sample(buddiesWithRoom, replicationFactor - 1))
+
+            # decrement the capacities for each replica
+            decrementCapacities(copyset)
+
+            return copyset
+
+      def simpleChunkReplicationFunc():
+         copyset = random.sample(capacities.keys(), replicationFactor)
+         # decrement the capacities for each replica
+         decrementCapacities(copyset)
+         return copyset
+
+      if scatterWidth < numNodes - 1:
+         return chunkReplicationFunc
+      else:
+         return simpleChunkReplicationFunc
 
 class PlotInfo(object):
    def __init__(self, label, linestyle='-', linewidth=4, marker='o',
