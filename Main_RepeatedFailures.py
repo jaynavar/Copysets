@@ -10,27 +10,26 @@ HOUR = 60 * MINUTE
 DAY = 24 * HOUR
 WEEK = 7 * DAY
 
-def runRepeatedFailuresExperiment(numNodes, intervals):
-   scatterWidths = [10, 200, 1000]
+def runRepeatedFailuresExperiment(numNodes, numIntervals, numTrials):
+   scatterWidths = [10, 50, 100, 500]
    # Failures every: 1 hour, 1 day, 1 week (in seconds)
-   failureIntervals = [1 * HOUR, 1 * DAY, 1 * WEEK]
+   failureIntervals = [1 * MINUTE, 30 * MINUTE, 1 * HOUR, 1 * DAY]
+   replicationFactor = 3
+   # set node parameters (10 Gb/s, 1 TB per node), in Mb's, assuming
+   # each peer can only dedicate 30% of capacity to node recovery
+   nodeBandwidth = 10000
+   nodeCapacity = 8 * 1000000
+   recoveryUtil = 0.3
 
    intervalData = []
    for failureInterval in failureIntervals:
       print 'Failure Interval: %d' % failureInterval
       scatterWidthData = []
       for scatterWidth in scatterWidths:
-         runner = RepeatedFailures.Runner(numNodes, scatterWidth, failureInterval)
-         # setup the simulated cluster
-         runner.setup()
-         probsOfDataLoss = []
-         for interval in range(intervals):
-            # cause repeated failure, and compute probability of data loss
-            probOfDataLoss = runner.failureProbOfDataLoss()
-            probsOfDataLoss.append((interval * failureInterval, probOfDataLoss))
-            # simulate recovery of the cluster over given interval
-            # before next failure
-            runner.recover(failureInterval)
+         runner = RepeatedFailures.Runner(
+            numNodes, scatterWidth, failureInterval, numIntervals, numTrials,
+            replicationFactor, nodeBandwidth, nodeCapacity, recoveryUtil)
+         probsOfDataLoss = runner.run()
          print 'Scatter Width: %d, Probs of Data Loss:\n%s' % (scatterWidth,
                                                                probsOfDataLoss)
          scatterWidthData.append((scatterWidth, probsOfDataLoss))
@@ -48,8 +47,11 @@ if __name__ == '__main__':
                        help='number of nodes in cluster')
    parser.add_argument('-i', '--intervals', default='5',
                        help='number of repeated failures to graph')
+   parser.add_argument('-t', '--trials', default='100',
+                       help='number of trials for each datapoint')
    args = parser.parse_args()
 
    DEBUG = args.debug
 
-   runRepeatedFailuresExperiment(int(args.numNodes), int(args.intervals))
+   runRepeatedFailuresExperiment(int(args.numNodes), int(args.intervals),
+                                 int(args.trials))
