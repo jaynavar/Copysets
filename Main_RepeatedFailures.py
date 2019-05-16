@@ -11,7 +11,7 @@ DAY = 24 * HOUR
 WEEK = 7 * DAY
 
 def runRepeatedFailuresExperiment(numNodes, numIntervals, numTrials):
-   scatterWidths = [2, 10, 200]
+   scatterWidths = [10, 200]
    # Failures every: 1 hour, 1 day, 1 week (in seconds)
    failureIntervals = [1 * MINUTE, 15 * MINUTE, 30 * MINUTE, 45 * MINUTE,
                        1 * HOUR, 1 * DAY]
