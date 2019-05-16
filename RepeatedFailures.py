@@ -62,7 +62,7 @@ class Runner(object):
          # separate them into copysets, add to set of all copysets
          for i in xrange(0, len(shuffledNodes), self.replicationFactor):
             copyset = tuple(
-               shuffledNodes[i : i + self.replicationFactor])
+               sorted(shuffledNodes[i : i + self.replicationFactor]))
             self.copysets.add(copyset)
 
       # create mapping from node to the other nodes it shares
@@ -80,14 +80,14 @@ class Runner(object):
          return 1.0
 
       # fail 1% of the nodes (remove from live, add to failed)
-      newFailedNodes = set(sorted(
-         random.sample(self.liveNodes, int(0.01 * len(self.liveNodes)))))
+      newFailedNodes = set(
+         random.sample(self.liveNodes, int(0.01 * len(self.liveNodes))))
       self.liveNodes.difference_update(newFailedNodes)
       self.failedNodes.update(newFailedNodes)
 
       # determine if failed nodes form one of the generated copysets
       self.lostData = not self.copysets.isdisjoint(
-         it.combinations(self.failedNodes, self.replicationFactor))
+         it.combinations(sorted(self.failedNodes), self.replicationFactor))
 
       if self.lostData:
          return 1.0
