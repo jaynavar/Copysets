@@ -101,9 +101,9 @@ def generateFigure6(schemePlotInfos, data, simulation=False):
 
    # save figure
    if simulation:
-      plt.savefig('Figure6_simulation.png')
+      plt.savefig('figures/Figure6_simulation.png')
    else:
-      plt.savefig('Figure6_computation.png')
+      plt.savefig('figures/Figure6_computation.png')
 
 if __name__ == '__main__':
    parser = argparse.ArgumentParser()
