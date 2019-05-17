@@ -63,7 +63,8 @@ class Runner(object):
          for i in xrange(0, len(shuffledNodes), self.replicationFactor):
             copyset = tuple(
                sorted(shuffledNodes[i : i + self.replicationFactor]))
-            self.copysets.add(copyset)
+            if len(copyset) == 3:
+               self.copysets.add(copyset)
 
       # create mapping from node to the other nodes it shares
       # copysets with, used to determine recovery time
@@ -95,14 +96,28 @@ class Runner(object):
          return 0.0
 
    def recover(self):
-      for failedNode in self.failedNodes.copy():
-         numBuddies = len(self.buddies[failedNode])
+      originalFailedNodes = self.failedNodes.copy()
+
+      failedBuddies = collections.defaultdict(set)
+      for failedNode in originalFailedNodes:
+         # create mapping from alive nodes to nodes
+         # they are helping recover
+         aliveBuddies = [buddy for buddy in self.buddies[failedNode]
+                         if buddy not in originalFailedNodes]
+         for aliveBuddy in aliveBuddies:
+            failedBuddies[aliveBuddy].add(failedNode)
+
+      for failedNode in originalFailedNodes:
+         aliveBuddies = [buddy for buddy in self.buddies[failedNode]
+                         if buddy not in originalFailedNodes]
 
          # determine recovery time, based on network bandwidth
          # of each peer they can dedicate to recovery,
          # and amount of data being recovered
-         recoveryTime = (self.nodeCapacity /
-                         float(self.recoveryUtil * numBuddies * self.nodeBandwidth))
+         totalBandwidth = sum(
+            [self.recoveryUtil * self.nodeBandwidth / len(failedBuddies[aliveBuddy])
+             for aliveBuddy in aliveBuddies])
+         recoveryTime = self.nodeCapacity / float(totalBandwidth)
 
          # check if recovered before next failure
          if recoveryTime < self.failureInterval:
