@@ -1,5 +1,9 @@
 #!/usr/bin/env python2
 import argparse
+import matplotlib
+#matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import numpy as np
 import RepeatedFailures
 
 DEBUG = False
@@ -37,8 +41,43 @@ def runRepeatedFailuresExperiment(numNodes, numIntervals, numTrials):
       print ''
       intervalData.append((failureInterval, scatterWidthData))
 
-   # output the figures
-   # TODO
+   outputFigures(intervalData)
+
+def outputFigures(intervalData):
+   for failureInterval, scatterWidthData in intervalData:
+      # TODO update title to include correct interval
+      fig = plt.figure()
+      fig.suptitle('Probability of data loss when 1%% of '
+                   'the nodes fail every %d' % failureInterval)
+
+      # add data
+      for scatterWidth, probsOfDataLoss in scatterWidthData:
+         x, y = zip(*probsOfDataLoss)
+         plt.plot(x, y, label='S=%d' % scatterWidth, linestyle='--',
+                  marker='o', markersize=8, markeredgewidth=0.0,
+                  clip_on=False)
+
+      # add legend
+      plt.legend(numpoints=1, handlelength=0.5, borderaxespad=1.0)
+
+      # set x-axis
+      plt.xlabel('Time')
+
+      # set y-axis
+      plt.ylabel('Probability of data loss')
+      yticksRange = np.arange(0.0, 1.0 + 0.1, 0.2)
+      plt.yticks(yticksRange)
+      ax = plt.gca()
+      ax.set_yticklabels(['{:,.0%}'.format(tick) for tick in yticksRange])
+
+      # TODO remove below
+      plt.show()
+
+      # save figure
+      # if simulation:
+      #    plt.savefig('Figure6_simulation.png')
+      # else:
+      #    plt.savefig('Figure6_computation.png')
 
 if __name__ == '__main__':
    parser = argparse.ArgumentParser()
