@@ -68,7 +68,7 @@ def outputFigures(intervalData):
       plt.legend(numpoints=1, handlelength=0.5, borderaxespad=1.0)
 
       # set x-axis
-      plt.xlabel('Time (HOURS:MINUTES)')
+      plt.xlabel('Time')
       ax = plt.gca()
       ax.xaxis.set_major_formatter(DateFormatter("%H:%M"))
       plt.gcf().autofmt_xdate()
