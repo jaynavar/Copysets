@@ -77,8 +77,8 @@ class Runner(object):
    def failureProbOfDataLoss(self):
       # if lost data in previous failure, we are considered as having
       # lost data in this failure as well
-      # if self.lostData:
-      #    return 1.0
+      if self.lostData:
+         return 1.0
 
       # fail 1% of the nodes (remove from live, add to failed)
       newFailedNodes = set(
