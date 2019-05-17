@@ -85,7 +85,7 @@ if __name__ == '__main__':
                        help='enable debugging output')
    parser.add_argument('-n', '--numNodes', default='5000',
                        help='number of nodes in cluster')
-   parser.add_argument('-i', '--intervals', default='5',
+   parser.add_argument('-i', '--intervals', default='10',
                        help='number of repeated failures to graph')
    parser.add_argument('-t', '--trials', default='100',
                        help='number of trials for each datapoint')
