@@ -28,13 +28,15 @@ class Runner(object):
       self.lostData = None
 
    def run(self):
-      probs = [[] for _ in range(self.numIntervals)]
+      isolatedProbs = [[] for _ in range(self.numIntervals)]
+      compoundingProbs = [[] for _ in range(self.numIntervals)]
       for _ in range(self.numTrials):
          # setup the cluster
          self.setup()
          for interval in range(self.numIntervals):
             # cause repeated failure, and compute probability of data loss
-            probs[interval].append(self.failureProbOfDataLoss())
+            isolatedProbs[interval].append(self.failureProbOfDataLoss())
+            compoundingProbs[interval].append(1.0 if self.lostData else 0.0)
             # simulate recovery of the cluster over given interval
             # before next failure
             self.recover()
@@ -43,7 +45,8 @@ class Runner(object):
       data = []
       for interval in range(self.numIntervals):
          data.append((interval * self.failureInterval,
-                      np.array(probs[interval]).mean()))
+                      (np.array(isolatedProbs[interval]).mean(),
+                       np.array(compoundingProbs[interval]).mean())))
       return data
 
    def setup(self):
@@ -75,11 +78,6 @@ class Runner(object):
          self.buddies[node].remove(node)
 
    def failureProbOfDataLoss(self):
-      # if lost data in previous failure, we are considered as having
-      # lost data in this failure as well
-      if self.lostData:
-         return 1.0
-
       # fail 1% of the nodes (remove from live, add to failed)
       newFailedNodes = set(
          random.sample(self.liveNodes, int(0.01 * len(self.liveNodes))))
@@ -87,10 +85,11 @@ class Runner(object):
       self.failedNodes.update(newFailedNodes)
 
       # determine if failed nodes form one of the generated copysets
-      self.lostData = not self.copysets.isdisjoint(
+      lostData = not self.copysets.isdisjoint(
          it.combinations(sorted(self.failedNodes), self.replicationFactor))
 
-      if self.lostData:
+      if lostData:
+         self.lostData = True
          return 1.0
       else:
          return 0.0
@@ -111,12 +110,13 @@ class Runner(object):
          aliveBuddies = [buddy for buddy in self.buddies[failedNode]
                          if buddy not in originalFailedNodes]
 
-         # determine recovery time, based on network bandwidth
-         # of each peer they can dedicate to recovery,
+         # determine recovery time, based on network bandwidth of recovering node,
+         # bandwidth of each peer that can be dedicated to recovery of this node,
          # and amount of data being recovered
-         totalBandwidth = sum(
-            [self.recoveryUtil * self.nodeBandwidth / len(failedBuddies[aliveBuddy])
-             for aliveBuddy in aliveBuddies])
+         totalBandwidth = min(self.nodeBandwidth, sum(
+            [self.recoveryUtil * self.nodeBandwidth /
+             float(len(failedBuddies[aliveBuddy]))
+             for aliveBuddy in aliveBuddies]))
          recoveryTime = self.nodeCapacity / float(totalBandwidth)
 
          # check if recovered before next failure

@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 RENDER_LOCAL = False
 import argparse
+import copy
 import datetime
 import matplotlib
 if not RENDER_LOCAL:
@@ -21,14 +22,13 @@ WEEK = 7 * DAY
 def runRepeatedFailuresExperiment(numNodes, numIntervals, numTrials):
    scatterWidths = [10, 200]
    # Failures every: 1 hour, 1 day, 1 week (in seconds)
-   failureIntervals = [1 * MINUTE, 15 * MINUTE, 30 * MINUTE, 45 * MINUTE,
-                       1 * HOUR]
+   failureIntervals = [1 * MINUTE, 10 * MINUTE, 20 * MINUTE, 30 * MINUTE]
    replicationFactor = 3
-   # set node parameters (1 Gb/s, 1 TB per node), in Mb's, assuming
-   # each peer can only dedicate 30% of capacity to node recovery
+   # set node parameters (1 Gb/s, 100 GB per node), in Mb's, assuming
+   # each peer can only dedicate 10% of capacity to node recovery
    nodeBandwidth = 1000
-   nodeCapacity = 8 * 1000000
-   recoveryUtil = 0.3
+   nodeCapacity = 8 * 100000
+   recoveryUtil = 0.1
 
    intervalData = []
    for failureInterval in failureIntervals:
@@ -48,42 +48,44 @@ def runRepeatedFailuresExperiment(numNodes, numIntervals, numTrials):
    outputFigures(intervalData)
 
 def outputFigures(intervalData):
-   for failureInterval, scatterWidthData in intervalData:
-      failureIntervalMinutes = int(failureInterval / 60)
-      # TODO update title to include correct interval
-      fig = plt.figure()
-      fig.suptitle('Probability of data loss when 1%% of '
-                   'the nodes fail every %d minutes' % failureIntervalMinutes )
+   for suffix in ['iso', 'comp']:
+      for failureInterval, scatterWidthData in intervalData:
+         failureIntervalMinutes = int(failureInterval / 60)
+         # TODO update title to include correct interval
+         fig = plt.figure()
+         fig.suptitle('Probability of data loss when 1%% of '
+                      'the nodes fail every %d minutes' % failureIntervalMinutes )
 
-      # add data
-      for scatterWidth, probsOfDataLoss in scatterWidthData:
-         x, y = zip(*probsOfDataLoss)
-         date = datetime.datetime(2019, 1, 1, 0, 0)
-         x = [date + datetime.timedelta(seconds=v) for v in x]
-         plt.plot(x, y, label='S=%d' % scatterWidth, linestyle='--',
-                  marker='o', markersize=8, markeredgewidth=0.0,
-                  clip_on=False)
+         # add data
+         for scatterWidth, probsOfDataLoss in scatterWidthData:
+            x, y = zip(*probsOfDataLoss)
+            y = [iso if suffix == 'iso' else comp for (iso, comp) in y]
+            date = datetime.datetime(2019, 1, 1, 0, 0)
+            x = [date + datetime.timedelta(seconds=v) for v in x]
+            plt.plot(x, y, label='S=%d' % scatterWidth, linestyle='--',
+                     marker='o', markersize=8, markeredgewidth=0.0,
+                     clip_on=False)
 
-      # add legend
-      plt.legend(numpoints=1, handlelength=0.5, borderaxespad=1.0)
+         # add legend
+         plt.legend(numpoints=1, handlelength=0.5, borderaxespad=1.0)
 
-      # set x-axis
-      plt.xlabel('Time')
-      ax = plt.gca()
-      ax.xaxis.set_major_formatter(DateFormatter("%H:%M"))
-      plt.gcf().autofmt_xdate()
+         # set x-axis
+         plt.xlabel('Time')
+         ax = plt.gca()
+         ax.xaxis.set_major_formatter(DateFormatter("%H:%M"))
+         plt.gcf().autofmt_xdate()
 
-      # set y-axis
-      plt.ylabel('Probability of data loss')
-      yticksRange = np.arange(0.0, 1.0 + 0.1, 0.2)
-      plt.yticks(yticksRange)
-      ax.set_yticklabels(['{:,.0%}'.format(tick) for tick in yticksRange])
+         # set y-axis
+         plt.ylabel('Probability of data loss')
+         yticksRange = np.arange(0.0, 1.0 + 0.1, 0.2)
+         plt.yticks(yticksRange)
+         ax.set_yticklabels(['{:,.0%}'.format(tick) for tick in yticksRange])
 
-      if RENDER_LOCAL:
-         plt.show()
-      else:
-         plt.savefig('figures/Figure_RepFails_Intv_%03d_mins.png' %
-                     failureIntervalMinutes)
+         if RENDER_LOCAL:
+            plt.show()
+         else:
+            plt.savefig('figures/Figure_RepFails_Intv_%03d_mins_%s.png' %
+                        (failureIntervalMinutes, suffix))
 
 if __name__ == '__main__':
    parser = argparse.ArgumentParser()
