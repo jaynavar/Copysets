@@ -3,6 +3,7 @@ RENDER_LOCAL = False
 import argparse
 import copy
 import datetime
+import json
 import matplotlib
 if not RENDER_LOCAL:
    matplotlib.use('Agg')
@@ -44,7 +45,7 @@ def runRepeatedFailuresExperiment(numNodes, numIntervals, numTrials):
       print ''
       intervalData.append((failureInterval, scatterWidthData))
 
-   outputFigures(intervalData)
+   return intervalData
 
 def outputFigures(intervalData):
    for suffix in ['iso', 'comp']:
@@ -96,9 +97,26 @@ if __name__ == '__main__':
                        help='number of repeated failures to graph')
    parser.add_argument('-t', '--trials', default='100',
                        help='number of trials for each datapoint')
+   parser.add_argument('-s', '--save',
+                       help='location to save data to')
+   parser.add_argument('-l', '--load',
+                       help='location to load data from')
+   parser.add_argument('--no-figures', action='store_true',
+                       help='do not generate figures')
    args = parser.parse_args()
 
    DEBUG = args.debug
 
-   runRepeatedFailuresExperiment(int(args.numNodes), int(args.intervals),
-                                 int(args.trials))
+   if args.load:
+      with open(args.load) as infile:
+         intervalData = json.load(infile)
+   else:
+      intervalData = runRepeatedFailuresExperiment(
+         int(args.numNodes), int(args.intervals), int(args.trials))
+
+   if args.save:
+      with open(args.save, 'w') as outfile:
+         json.dump(intervalData, outfile, indent=2)
+
+   if not args.no_figures:
+      outputFigures(intervalData)
