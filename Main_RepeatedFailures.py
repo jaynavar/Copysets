@@ -21,13 +21,13 @@ DAY = 24 * HOUR
 WEEK = 7 * DAY
 
 def runRepeatedFailuresExperiment(numNodes, numIntervals, numTrials):
-   scatterWidths = [10, 20, 100, 200]
+   scatterWidths = [10, 200]
    failureIntervals = [1 * MINUTE, 25 * MINUTE, 50 * MINUTE]
    replicationFactor = 3
-   # set node parameters (10 Gb/s, 1 TB per node), in Mb's, assuming
+   # set node parameters (1 Gb/s, 100 GB per node), in Mb's, assuming
    # each peer can only dedicate 10% of capacity to node recovery
-   nodeBandwidth = 10000
-   nodeCapacity = 8 * 1000000
+   nodeBandwidth = 1000
+   nodeCapacity = 8 * 100000
    recoveryUtil = 0.05
 
    intervalData = []
