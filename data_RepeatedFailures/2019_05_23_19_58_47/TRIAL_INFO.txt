@@ -1,0 +1,9 @@
+Nodes: 5000
+Intervals: 10
+Trials: 100
+Scatter widths: [10, 20, 100, 200]
+Failure intervals: [60, 1500, 3000]
+Replication factor: 3
+Node bandwidth (Mb/s): 10000
+Node capacity (GB): 1000
+Recovery utilization rate: 0.050000
