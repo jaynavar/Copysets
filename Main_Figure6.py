@@ -119,6 +119,8 @@ if __name__ == '__main__':
                        help='location to save data to')
    parser.add_argument('-l', '--load',
                        help='location to load data from')
+   parser.add_argument('--note', default='N/A',
+                       help='add comment to trial info')
    parser.add_argument('-g', '--groupSize', default='500',
                        help='size of debug summary groups')
    parser.add_argument('--simulation', action='store_true',
@@ -140,6 +142,8 @@ if __name__ == '__main__':
    GROUP_SIZE = int(args.groupSize)
 
    trialInfo = [
+      'Trial Note: %s' % args.note,
+      '',
       'Trials: %s' % args.trials,
       'Simulation: %r' % args.simulation,
    ]

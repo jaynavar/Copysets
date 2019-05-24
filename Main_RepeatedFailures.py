@@ -95,6 +95,8 @@ if __name__ == '__main__':
                        help='location to save data to')
    parser.add_argument('-l', '--load',
                        help='location to load data from')
+   parser.add_argument('--note', default='N/A',
+                       help='add comment to trial info')
    parser.add_argument('-n', '--numNodes', default='5000',
                        help='number of nodes in cluster')
    parser.add_argument('-i', '--intervals', default='10',
@@ -115,6 +117,8 @@ if __name__ == '__main__':
    DEBUG = args.debug
 
    trialInfo = [
+      'Trial Note: %s' % args.note,
+      '',
       'Nodes: %s' % args.numNodes,
       'Intervals: %s' % args.intervals,
       'Trials: %s' % args.trials,
