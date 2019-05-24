@@ -25,7 +25,8 @@ class FacebookRandomScheme(FacebookScheme):
 
       return probOfDataLoss
 
-   def plotInfo(self):
+   @staticmethod
+   def plotInfo():
       return Replication.PlotInfo('Facebook, Random Replication',
                                   linestyle='-.', marker='o', markersize=10,
                                   color='lime')
@@ -39,6 +40,7 @@ class FacebookCopysetScheme(FacebookScheme):
       return self.copysetReplicationDataLoss(
          numNodes, self.chunksPerNode, self.replicationFactor, self.scatterWidth)
 
-   def plotInfo(self):
+   @staticmethod
+   def plotInfo():
       return Replication.PlotInfo('Facebook, Copyset Replication',
                                   linestyle='-.', marker='s', color='fuchsia')

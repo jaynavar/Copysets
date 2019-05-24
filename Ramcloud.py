@@ -24,7 +24,8 @@ class RamcloudRandomScheme(RamcloudScheme):
       return self.randomReplicationDataLoss(
          numNodes, self.chunksPerNode, self.replicationFactor)
 
-   def plotInfo(self):
+   @staticmethod
+   def plotInfo():
       return Replication.PlotInfo('RAMCloud, Random Replication',
                                   linestyle='--', marker='s', color='blue')
 
@@ -37,7 +38,8 @@ class RamcloudCopysetScheme(RamcloudScheme):
       return self.copysetReplicationDataLoss(
          numNodes, self.chunksPerNode, self.replicationFactor, self.scatterWidth)
 
-   def plotInfo(self):
+   @staticmethod
+   def plotInfo():
       return Replication.PlotInfo('RAMCloud, Copyset Replication',
                                   linestyle='--', marker='o', markersize=10,
                                   color='maroon')

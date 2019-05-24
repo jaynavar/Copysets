@@ -1,15 +1,12 @@
 #!/usr/bin/env python2
-RENDER_LOCAL = False
 import argparse
 import copy
+from ExperimentTrack import ExperimentTrack
 import datetime
-import json
 import matplotlib
-if not RENDER_LOCAL:
-   matplotlib.use('Agg')
 from matplotlib.dates import DateFormatter
-import matplotlib.pyplot as plt
 import numpy as np
+import os
 import RepeatedFailures
 
 DEBUG = False
@@ -20,24 +17,25 @@ HOUR = 60 * MINUTE
 DAY = 24 * HOUR
 WEEK = 7 * DAY
 
-def runRepeatedFailuresExperiment(numNodes, numIntervals, numTrials):
-   scatterWidths = [10, 20, 100, 200]
-   failureIntervals = [1 * MINUTE, 25 * MINUTE, 50 * MINUTE]
-   replicationFactor = 3
-   # set node parameters (10 Gb/s, 1 TB per node), in Mb's, assuming
-   # each peer can only dedicate 10% of capacity to node recovery
-   nodeBandwidth = 10000
-   nodeCapacity = 8 * 1000000
-   recoveryUtil = 0.05
+# cluster parameters
+SCATTER_WIDTHS = [10, 20, 100, 200]
+FAILURE_INTERVALS = [1 * MINUTE, 25 * MINUTE, 50 * MINUTE]
+REPLICATION_FACTOR = 3
+# set node parameters (10 Gb/s, 1 TB per node), in Mb's, assuming
+# each peer can only dedicate 10% of capacity to node recovery
+NODE_BANDWIDTH = 10000
+NODE_CAPACITY = 8 * 1000000
+RECOVERY_UTIL = 0.05
 
+def runRepeatedFailuresExperiment(numNodes, numIntervals, numTrials):
    intervalData = []
-   for failureInterval in failureIntervals:
+   for failureInterval in FAILURE_INTERVALS:
       print 'Failure Interval: %d' % failureInterval
       scatterWidthData = []
-      for scatterWidth in scatterWidths:
+      for scatterWidth in SCATTER_WIDTHS:
          runner = RepeatedFailures.Runner(
             numNodes, scatterWidth, failureInterval, numIntervals, numTrials,
-            replicationFactor, nodeBandwidth, nodeCapacity, recoveryUtil)
+            REPLICATION_FACTOR, NODE_BANDWIDTH, NODE_CAPACITY, RECOVERY_UTIL)
          probsOfDataLoss = runner.run()
          print 'Scatter Width: %d, Probs of Data Loss:\n%s' % (scatterWidth,
                                                                probsOfDataLoss)
@@ -47,7 +45,7 @@ def runRepeatedFailuresExperiment(numNodes, numIntervals, numTrials):
 
    return intervalData
 
-def outputFigures(intervalData):
+def outputFigures(intervalData, et):
    for suffix in ['iso', 'comp']:
       for failureInterval, scatterWidthData in intervalData:
          failureIntervalMinutes = int(failureInterval / 60)
@@ -84,39 +82,60 @@ def outputFigures(intervalData):
          if RENDER_LOCAL:
             plt.show()
          else:
-            plt.savefig('figures/Figure_RepFails_Intv_%03d_mins_%s.png' %
-                        (failureIntervalMinutes, suffix))
+            if et.save:
+               filename = ('Figure_RepFails_Intv_%03d_mins_%s.png' %
+                           (failureIntervalMinutes, suffix))
+               plt.savefig(os.path.join(et.getDirName(), filename))
 
 if __name__ == '__main__':
    parser = argparse.ArgumentParser()
    parser.add_argument('-d', '--debug', action='store_true',
                        help='enable debugging output')
+   parser.add_argument('-s', '--save', action='store_true',
+                       help='location to save data to')
+   parser.add_argument('-l', '--load',
+                       help='location to load data from')
    parser.add_argument('-n', '--numNodes', default='5000',
                        help='number of nodes in cluster')
    parser.add_argument('-i', '--intervals', default='10',
                        help='number of repeated failures to graph')
    parser.add_argument('-t', '--trials', default='100',
                        help='number of trials for each datapoint')
-   parser.add_argument('-s', '--save',
-                       help='location to save data to')
-   parser.add_argument('-l', '--load',
-                       help='location to load data from')
    parser.add_argument('--no-figures', action='store_true',
                        help='do not generate figures')
+   parser.add_argument('-r', '--render-local', action='store_true',
+                       help='render figure locally using X11')
    args = parser.parse_args()
+
+   RENDER_LOCAL = args.render_local
+   if not RENDER_LOCAL:
+      matplotlib.use('Agg')
+   import matplotlib.pyplot as plt
 
    DEBUG = args.debug
 
+   trialInfo = [
+      'Nodes: %s' % args.numNodes,
+      'Intervals: %s' % args.intervals,
+      'Trials: %s' % args.trials,
+      'Scatter widths: %s' % SCATTER_WIDTHS,
+      'Failure intervals: %s' % FAILURE_INTERVALS,
+      'Replication factor: %d' % REPLICATION_FACTOR,
+      'Node bandwidth (Mb/s): %d' % NODE_BANDWIDTH,
+      'Node capacity (GB): %d' % (NODE_CAPACITY / (8 * 1000)),
+      'Recovery utilization rate: %f' % RECOVERY_UTIL,
+   ]
+   et = ExperimentTrack('data_RepeatedFailures', trialInfo, args.save)
+
    if args.load:
-      with open(args.load) as infile:
-         intervalData = json.load(infile)
+      intervalData = et.loadData(args.load)
    else:
       intervalData = runRepeatedFailuresExperiment(
          int(args.numNodes), int(args.intervals), int(args.trials))
 
-   if args.save:
-      with open(args.save, 'w') as outfile:
-         json.dump(intervalData, outfile, indent=2)
+   et.dumpData(intervalData)
 
    if not args.no_figures:
-      outputFigures(intervalData)
+      outputFigures(intervalData, et)
+
+   et.setCleanExit()
