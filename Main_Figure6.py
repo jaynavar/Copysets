@@ -9,7 +9,6 @@ import os
 import Ramcloud
 
 DEBUG = False
-GROUP_SIZE = 500
 RENDER_LOCAL = False
 
 RANDOM_REPLICATION_SCHEMES = [
@@ -52,9 +51,7 @@ def runFigure6Experiment(rf=3, maxNodes=10000, simulation=False, trials=100,
       data[type(scheme).__name__] = results
    return data
 
-def generateDiagram(data, groupSize=None):
-   if groupSize is None:
-      groupSize = GROUP_SIZE
+def generateDiagram(data, groupSize=500):
    def outputDataPoints(dataPoints):
       # output stats for the group
       firstN = dataPoints[0][0]
@@ -72,12 +69,16 @@ def generateDiagram(data, groupSize=None):
       schemeName = schemePlotInfo.label
       print 'Scheme: %s' % schemeName
       dataPoints = []
+      minNumNodes = None
       for numNodes, prob in data[key]:
-         dataPoints.append((numNodes, prob))
-         if len(dataPoints) == groupSize:
+         if minNumNodes == None:
+            minNumNodes = numNodes
+         if numNodes - minNumNodes >= groupSize:
             outputDataPoints(dataPoints)
             # reset state
             dataPoints = []
+            minNumNodes = numNodes
+         dataPoints.append((numNodes, prob))
       if dataPoints:
          outputDataPoints(dataPoints)
       print ''
@@ -135,7 +136,7 @@ if __name__ == '__main__':
                        help='location to load data from')
    parser.add_argument('--note', default='N/A',
                        help='add comment to trial info')
-   parser.add_argument('-g', '--groupSize', default='500',
+   parser.add_argument('-g', '--group-size', default='500',
                        help='size of debug summary groups')
    parser.add_argument('--sample-gap', default='1',
                        help='gap between sampled datapoints')
@@ -155,7 +156,6 @@ if __name__ == '__main__':
    import matplotlib.pyplot as plt
 
    DEBUG = args.debug
-   GROUP_SIZE = int(args.groupSize)
 
    trialInfo = [
       'Trial Note: %s' % args.note,
@@ -173,7 +173,7 @@ if __name__ == '__main__':
                                   trials=int(args.trials),
                                   sampleGap=int(args.sample_gap))
 
-   generateDiagram(data)
+   generateDiagram(data, groupSize=int(args.group_size))
    et.dumpData(data)
 
    if not args.no_figures:
