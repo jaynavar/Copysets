@@ -50,7 +50,6 @@ def runFigure6Experiment(rf=3, maxNodes=10000, simulation=False, trials=100,
          else:
             results.append((numNodes, scheme.probabilityOfDataLoss(numNodes)))
       data[type(scheme).__name__] = results
-   generateDiagram(data)
    return data
 
 def generateDiagram(data, groupSize=None):
@@ -174,6 +173,7 @@ if __name__ == '__main__':
                                   trials=int(args.trials),
                                   sampleGap=int(args.sample_gap))
 
+   generateDiagram(data)
    et.dumpData(data)
 
    if not args.no_figures:
