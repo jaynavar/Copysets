@@ -9,7 +9,7 @@ import os
 import Ramcloud
 
 DEBUG = False
-GROUP_SIZE = 300
+GROUP_SIZE = 500
 RENDER_LOCAL = False
 
 REPLICATION_SCHEMES = [
@@ -23,7 +23,8 @@ REPLICATION_SCHEMES = [
 SCHEME_PLOT_INFOS = [(scheme.__name__, scheme.plotInfo())
                      for scheme in REPLICATION_SCHEMES]
 
-def runFigure6Experiment(rf=3, maxNodes=10000, simulation=False, trials=100):
+def runFigure6Experiment(rf=3, maxNodes=10000, simulation=False, trials=100,
+                         sampleGap=1):
    # can't have less than replication factor number of nodes
    minNodes = rf
 
@@ -35,10 +36,10 @@ def runFigure6Experiment(rf=3, maxNodes=10000, simulation=False, trials=100):
    data = {}
    for scheme in replicationSchemes:
       results = []
-      for numNodes in range(minNodes):
+      for numNodes in range(0, minNodes, sampleGap):
          # add initial (0, 0) datapoints below minimum number of nodes
          results.append((0, 0))
-      for numNodes in range(minNodes, maxNodes + 1):
+      for numNodes in range(minNodes, maxNodes + 1, sampleGap):
          results.append((numNodes, scheme.probabilityOfDataLoss(numNodes)))
       data[type(scheme).__name__] = results
    generateDiagram(data)
@@ -123,6 +124,8 @@ if __name__ == '__main__':
                        help='add comment to trial info')
    parser.add_argument('-g', '--groupSize', default='500',
                        help='size of debug summary groups')
+   parser.add_argument('--sample-gap', default='1',
+                       help='gap between sampled datapoints')
    parser.add_argument('--simulation', action='store_true',
                        help='use simulation instead of computation')
    parser.add_argument('-t', '--trials', default='100',
@@ -146,6 +149,7 @@ if __name__ == '__main__':
       '',
       'Trials: %s' % args.trials,
       'Simulation: %r' % args.simulation,
+      'Sample gap: %s' % args.sample_gap,
    ]
    et = ExperimentTrack('data_Figure6', trialInfo, args.save)
 
@@ -153,7 +157,8 @@ if __name__ == '__main__':
       data = et.loadData(args.load)
    else:
       data = runFigure6Experiment(simulation=args.simulation,
-                                  trials=int(args.trials))
+                                  trials=int(args.trials),
+                                  sampleGap=int(args.sample_gap))
 
    et.dumpData(data)
 
