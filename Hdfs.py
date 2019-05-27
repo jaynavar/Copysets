@@ -23,8 +23,9 @@ class HdfsRandomScheme(HdfsScheme):
 
 class HdfsCopysetScheme(HdfsScheme):
    def probabilityOfDataLossSimulation(self, numNodes):
-      # TODO
-      return 0
+      return self.simulationCopysetDataLoss(
+         self.trials, numNodes, self.chunksPerNode, self.replicationFactor,
+         self.scatterWidth)
 
    def probabilityOfDataLossComputation(self, numNodes):
       return self.copysetReplicationDataLoss(

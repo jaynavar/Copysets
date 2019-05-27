@@ -12,16 +12,19 @@ DEBUG = False
 GROUP_SIZE = 500
 RENDER_LOCAL = False
 
-REPLICATION_SCHEMES = [
+RANDOM_REPLICATION_SCHEMES = [
    Hdfs.HdfsRandomScheme,
    Ramcloud.RamcloudRandomScheme,
    Facebook.FacebookRandomScheme,
+]
+COPYSET_REPLICATION_SCHEMES = [
    Hdfs.HdfsCopysetScheme,
    Facebook.FacebookCopysetScheme,
    Ramcloud.RamcloudCopysetScheme,
 ]
+ALL_REPLICATION_SCHEMES = RANDOM_REPLICATION_SCHEMES + COPYSET_REPLICATION_SCHEMES
 SCHEME_PLOT_INFOS = [(scheme.__name__, scheme.plotInfo())
-                     for scheme in REPLICATION_SCHEMES]
+                     for scheme in ALL_REPLICATION_SCHEMES]
 
 def runFigure6Experiment(rf=3, maxNodes=10000, simulation=False, trials=100,
                          sampleGap=1):
@@ -31,10 +34,14 @@ def runFigure6Experiment(rf=3, maxNodes=10000, simulation=False, trials=100,
    # gather the data from the replication schemes
    replicationKwargs = {'debug': DEBUG, 'simulation': simulation,
                         'trials': trials, 'replicationFactor': 3}
+   # currently only support copyset replication for simulations
+   validReplicationSchemes = (ALL_REPLICATION_SCHEMES if not simulation else
+                              COPYSET_REPLICATION_SCHEMES)
    replicationSchemes = [scheme(**replicationKwargs)
-                         for scheme in REPLICATION_SCHEMES]
+                         for scheme in validReplicationSchemes]
    data = {}
    for scheme in replicationSchemes:
+      print 'Collecting data for: %s\n' % type(scheme).__name__
       results = []
       for numNodes in range(0, minNodes, sampleGap):
          # add initial (0, 0) datapoints below minimum number of nodes
@@ -60,6 +67,8 @@ def generateDiagram(data, groupSize=None):
 
    # print average probabilities for groups of data points
    for key, schemePlotInfo in SCHEME_PLOT_INFOS:
+      if key not in data:
+         continue
       schemeName = schemePlotInfo.label
       print 'Scheme: %s' % schemeName
       dataPoints = []
@@ -80,6 +89,8 @@ def generateFigure6(data, et, simulation=False):
 
    # add data
    for key, schemePlotInfo in SCHEME_PLOT_INFOS:
+      if key not in data:
+         continue
       spi = schemePlotInfo
       x, y = zip(*data[key])
       plt.plot(x, y, label=spi.label, linestyle=spi.linestyle,

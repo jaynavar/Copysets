@@ -33,8 +33,9 @@ class FacebookRandomScheme(FacebookScheme):
 
 class FacebookCopysetScheme(FacebookScheme):
    def probabilityOfDataLossSimulation(self, numNodes):
-      # TODO
-      return 0
+      return self.simulationCopysetDataLoss(
+         self.trials, numNodes, self.chunksPerNode, self.replicationFactor,
+         self.scatterWidth)
 
    def probabilityOfDataLossComputation(self, numNodes):
       return self.copysetReplicationDataLoss(

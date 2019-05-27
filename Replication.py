@@ -52,8 +52,38 @@ class ReplicationScheme(object):
       return probOfDataLoss
 
    @staticmethod
-   def simulationDataLoss(trials, numNodes, chunksPerNode, replicationFactor,
-                          generateReplicationFunc):
+   def simulationCopysetDataLoss(trials, numNodes, chunksPerNode, replicationFactor,
+                                 scatterWidth):
+      # setup implicit parameters
+      numFailedNodes = int(0.01 * numNodes)
+      permutations = int(scatterWidth / float(replicationFactor - 1))
+
+      shuffledNodes = range(numNodes)
+      results = []
+      for _ in range(trials):
+         lostData = False
+         for p in xrange(permutations):
+            # permute the nodes
+            random.shuffle(shuffledNodes)
+            # separate them into copysets, check if any of the copysets
+            # contain all failed nodes
+            for i in xrange(0, numNodes, replicationFactor):
+               if len([node for node in shuffledNodes[i : i + replicationFactor]
+                       if node < numFailedNodes]) == 3:
+                  # assume failed nodes are [0, #_failed_nodes)
+                  lostData = True
+                  break
+            if lostData:
+               break
+
+         results.append(1.0 if lostData else 0.0)
+
+      # return average of the results, which is probability of data loss
+      return np.array(results).mean()
+
+   @staticmethod
+   def perChunkSimulationDataLoss(trials, numNodes, chunksPerNode,
+                                  replicationFactor, generateReplicationFunc):
       results = []
       for _ in range(trials):
          # setup other parameters, we only have cluster at 80% load to avoid

@@ -12,7 +12,7 @@ class ExperimentTrack(object):
       self.save = save
 
       if self.save and not os.path.exists(self.dataDir):
-         print "Saving experiment data in: %s" % self.dataDir
+         print "Saving experiment data in: %s\n" % self.dataDir
 
          # create directory
          os.makedirs(self.dataDir)
