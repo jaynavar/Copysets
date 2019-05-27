@@ -1,0 +1,5 @@
+Trial Note: N/A
+
+Trials: 10000
+Simulation: True
+Sample gap: 1000
