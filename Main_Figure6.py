@@ -43,11 +43,12 @@ def runFigure6Experiment(rf=3, maxNodes=10000, simulation=False, trials=100,
    for scheme in replicationSchemes:
       print 'Collecting data for: %s\n' % type(scheme).__name__
       results = []
-      for numNodes in range(0, minNodes, sampleGap):
-         # add initial (0, 0) datapoints below minimum number of nodes
-         results.append((0, 0))
-      for numNodes in range(minNodes, maxNodes + 1, sampleGap):
-         results.append((numNodes, scheme.probabilityOfDataLoss(numNodes)))
+      for numNodes in range(0, maxNodes + 1, sampleGap):
+         if numNodes < minNodes:
+            # add initial (0, 0) datapoints below minimum number of nodes
+            results.append((0, 0))
+         else:
+            results.append((numNodes, scheme.probabilityOfDataLoss(numNodes)))
       data[type(scheme).__name__] = results
    generateDiagram(data)
    return data
@@ -82,7 +83,7 @@ def generateDiagram(data, groupSize=None):
          outputDataPoints(dataPoints)
       print ''
 
-def generateFigure6(data, et, simulation=False):
+def generateFigure6(data, et, simulation=False, sampleGap=1):
    # set dimensions and title
    fig = plt.figure(figsize=(8, 5))
    fig.suptitle('Probability of data loss when 1% of the nodes fail concurrently')
@@ -93,9 +94,11 @@ def generateFigure6(data, et, simulation=False):
          continue
       spi = schemePlotInfo
       x, y = zip(*data[key])
+      # mark every 1,000 ticks, regardless of sample gap
+      markevery = int(1000 / sampleGap)
       plt.plot(x, y, label=spi.label, linestyle=spi.linestyle,
                linewidth=spi.linewidth, marker=spi.marker,
-               markevery=spi.markevery, markersize=spi.markersize,
+               markevery=markevery, markersize=spi.markersize,
                markeredgewidth=spi.markeredgewidth,
                color=spi.color, clip_on=spi.clip_on)
 
@@ -174,6 +177,7 @@ if __name__ == '__main__':
    et.dumpData(data)
 
    if not args.no_figures:
-      generateFigure6(data, et, simulation=args.simulation)
+      generateFigure6(data, et, simulation=args.simulation,
+                      sampleGap=int(args.sample_gap))
 
    et.setCleanExit()
