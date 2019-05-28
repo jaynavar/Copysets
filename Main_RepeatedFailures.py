@@ -100,7 +100,7 @@ def outputIntervalFigures(intervalData, et):
       for failureInterval, scatterWidthData in intervalData:
          for scatterWidth, probsOfDataLoss in scatterWidthData:
             data[scatterWidth].append((failureInterval,
-                                       probsOfDataLoss[repeatedFailures]))
+                                       probsOfDataLoss[repeatedFailures][1]))
       return sorted(data.items())
 
    for numRepeats in REPEATED_FAILURES:
