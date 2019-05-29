@@ -23,7 +23,7 @@ REPEATED_FAILURES = [1, 5, 10]
 
 # cluster parameters
 SCATTER_WIDTHS = [10, 20, 100, 200]
-FAILURE_INTERVALS = [x * MINUTE for x in range(5, 40 + 1, 5)]
+FAILURE_INTERVALS = [x * MINUTE for x in range(10, 36 + 1, 2)]
 REPLICATION_FACTOR = 3
 # set node parameters (10 Gb/s, 1 TB per node), in Mb's, assuming
 # each peer can only dedicate 10% of capacity to node recovery
@@ -90,6 +90,7 @@ def outputFailureFigures(intervalData, et):
                filename = ('Figure_RepFails_Intv_%03d_mins_%s.png' %
                            (failureIntervalMinutes, suffix))
                plt.savefig(os.path.join(et.getDirName(), filename))
+         plt.close()
 
 def outputIntervalFigures(intervalData, et):
    def reformatData(repeatedFailures):
@@ -140,6 +141,7 @@ def outputIntervalFigures(intervalData, et):
                filename = ('Figure_RepFails_%02d_Reps_%s.png' %
                            (numRepeats, suffix))
                plt.savefig(os.path.join(et.getDirName(), filename))
+         plt.close()
 
 
 def outputFigures(intervalData, et):

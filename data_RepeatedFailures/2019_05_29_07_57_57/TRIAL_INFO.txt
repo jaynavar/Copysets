@@ -1,0 +1,12 @@
+Trial Note: N/A
+
+Nodes: 5000
+Intervals: 10
+Trials: 1000
+Scatter widths: [10, 20, 100, 200]
+Failure intervals: [600, 720, 840, 960, 1080, 1200, 1320, 1440, 1560, 1680, 1800, 1920, 2040, 2160]
+Replication factor: 3
+Node bandwidth (Mb/s): 10000
+Node capacity (GB): 1000
+Recovery utilization rate: 0.050000
+Repeated failures (for figures): [1, 5, 10]
