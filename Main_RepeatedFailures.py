@@ -23,7 +23,7 @@ REPEATED_FAILURES = [1, 5, 10]
 
 # cluster parameters
 SCATTER_WIDTHS = [10, 20, 100, 200]
-FAILURE_INTERVALS = [1 * MINUTE, 25 * MINUTE, 50 * MINUTE]
+FAILURE_INTERVALS = [x * MINUTE for x in range(0, 60 + 1, 5)]
 REPLICATION_FACTOR = 3
 # set node parameters (10 Gb/s, 1 TB per node), in Mb's, assuming
 # each peer can only dedicate 10% of capacity to node recovery
