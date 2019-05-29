@@ -10,7 +10,7 @@ class Runner(object):
       self.numNodes = numNodes
       self.scatterWidth = scatterWidth
       self.failureInterval = failureInterval
-      self.numIntervals = numIntervals + 1
+      self.numIntervals = numIntervals
       self.numTrials = numTrials
       self.replicationFactor = replicationFactor
       self.nodeBandwidth = nodeBandwidth
