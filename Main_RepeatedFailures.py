@@ -137,7 +137,7 @@ def outputIntervalFigures(intervalData, et):
             plt.show()
          else:
             if et.save:
-               filename = ('Figure_RepFails_%d_Reps_%s.png' %
+               filename = ('Figure_RepFails_%02d_Reps_%s.png' %
                            (numRepeats, suffix))
                plt.savefig(os.path.join(et.getDirName(), filename))
 
@@ -145,7 +145,7 @@ def outputIntervalFigures(intervalData, et):
 def outputFigures(intervalData, et):
    # output the figures showing probability of data loss over the course
    # of an outage over fixed intervals
-   # outputFailureFigures(intervalData, et)
+   outputFailureFigures(intervalData, et)
 
    # output the figure showing probability of data loss after fixed number
    # of repeated failures as a functin of the interval length
