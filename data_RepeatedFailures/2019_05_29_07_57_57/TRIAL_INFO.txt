@@ -10,3 +10,5 @@ Node bandwidth (Mb/s): 10000
 Node capacity (GB): 1000
 Recovery utilization rate: 0.050000
 Repeated failures (for figures): [1, 5, 10]
+
+Runtime (DD:HH:MM:SS): 00:10:17:20
