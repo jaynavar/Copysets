@@ -14,11 +14,9 @@ class RamcloudScheme(Replication.ReplicationScheme):
 
 class RamcloudRandomScheme(RamcloudScheme):
    def probabilityOfDataLossSimulation(self, numNodes):
-      generateReplicationFunc = self.generateRandomReplicationFunc(
-         numNodes, self.chunksPerNode, self.replicationFactor, numNodes - 1)
-      return self.perChunkSimulationDataLoss(
+      return self.simulationRandomDataLoss(
          self.trials, numNodes, self.chunksPerNode, self.replicationFactor,
-         generateReplicationFunc)
+         self.scatterWidth)
 
    def probabilityOfDataLossComputation(self, numNodes):
       return self.randomReplicationDataLoss(

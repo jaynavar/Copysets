@@ -12,14 +12,14 @@ DEBUG = False
 RENDER_LOCAL = False
 
 RANDOM_REPLICATION_SCHEMES = [
-   Hdfs.HdfsRandomScheme,
-   Ramcloud.RamcloudRandomScheme,
+   # Hdfs.HdfsRandomScheme,
+   # Ramcloud.RamcloudRandomScheme,
    Facebook.FacebookRandomScheme,
 ]
 COPYSET_REPLICATION_SCHEMES = [
-   Hdfs.HdfsCopysetScheme,
-   Facebook.FacebookCopysetScheme,
-   Ramcloud.RamcloudCopysetScheme,
+   # Hdfs.HdfsCopysetScheme,
+   # Facebook.FacebookCopysetScheme,
+   # Ramcloud.RamcloudCopysetScheme,
 ]
 ALL_REPLICATION_SCHEMES = RANDOM_REPLICATION_SCHEMES + COPYSET_REPLICATION_SCHEMES
 SCHEME_PLOT_INFOS = [(scheme.__name__, scheme.plotInfo())
@@ -34,8 +34,9 @@ def runFigure6Experiment(rf=3, maxNodes=10000, simulation=False, trials=100,
    replicationKwargs = {'debug': DEBUG, 'simulation': simulation,
                         'trials': trials, 'replicationFactor': 3}
    # currently only support copyset replication for simulations
-   validReplicationSchemes = (ALL_REPLICATION_SCHEMES if not simulation else
-                              COPYSET_REPLICATION_SCHEMES)
+   # validReplicationSchemes = (ALL_REPLICATION_SCHEMES if not simulation else
+   #                            COPYSET_REPLICATION_SCHEMES)
+   validReplicationSchemes = ALL_REPLICATION_SCHEMES
    replicationSchemes = [scheme(**replicationKwargs)
                          for scheme in validReplicationSchemes]
    data = {}
@@ -44,11 +45,14 @@ def runFigure6Experiment(rf=3, maxNodes=10000, simulation=False, trials=100,
       results = []
       for numNodes in range(0, maxNodes + 1, sampleGap):
          if numNodes < minNodes:
-            # add initial (0, 0) datapoints below minimum number of nodes
-            results.append((0, 0))
+            result = 0
          else:
-            results.append((numNodes, scheme.probabilityOfDataLoss(numNodes)))
+            result = scheme.probabilityOfDataLoss(numNodes)
+         results.append((numNodes, result))
+         if DEBUG:
+            print 'N=%d, P=%0.3f' % (numNodes, result)
       data[type(scheme).__name__] = results
+      print ''
    return data
 
 def generateDiagram(data, groupSize=500):

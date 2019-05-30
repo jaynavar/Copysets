@@ -9,8 +9,9 @@ class HdfsScheme(Replication.ReplicationScheme):
 
 class HdfsRandomScheme(HdfsScheme):
    def probabilityOfDataLossSimulation(self, numNodes):
-      # TODO
-      return 0
+      return self.simulationRandomDataLoss(
+         self.trials, numNodes, self.chunksPerNode, self.replicationFactor,
+         self.scatterWidth)
 
    def probabilityOfDataLossComputation(self, numNodes):
       return self.randomReplicationDataLoss(

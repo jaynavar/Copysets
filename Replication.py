@@ -69,11 +69,75 @@ class ReplicationScheme(object):
             # contain all failed nodes
             for i in xrange(0, numNodes, replicationFactor):
                if len([node for node in shuffledNodes[i : i + replicationFactor]
-                       if node < numFailedNodes]) == 3:
+                       if node < numFailedNodes]) == replicationFactor:
                   # assume failed nodes are [0, #_failed_nodes)
                   lostData = True
                   break
             if lostData:
+               break
+
+         results.append(1.0 if lostData else 0.0)
+
+      # return average of the results, which is probability of data loss
+      return np.array(results).mean()
+
+   @staticmethod
+   def simulationRandomDataLoss(trials, numNodes, chunksPerNode, replicationFactor,
+                                scatterWidth):
+      numFailedNodes = int(0.01 * numNodes)
+      numTotalChunks = numNodes * chunksPerNode / replicationFactor
+
+      if numFailedNodes < replicationFactor:
+         # can't lose data if not enough nodes failed
+         return 0.0
+
+      results = []
+      for _ in range(trials):
+         lostData = False
+         for _ in range(numTotalChunks):
+            # assume failed nodes are [0, #_failed_nodes)
+            if (len([n for n in random.sample(xrange(numNodes), replicationFactor)
+                     if n < numFailedNodes])
+                == replicationFactor):
+               lostData = True
+               break
+
+         results.append(1.0 if lostData else 0.0)
+
+      # return average of the results, which is probability of data loss
+      return np.array(results).mean()
+
+   @staticmethod
+   def simulationFacebookRandomDataLoss(trials, numNodes, chunksPerNode,
+                                        replicationFactor, scatterWidth):
+      numFailedNodes = int(0.01 * numNodes)
+
+      if numFailedNodes < replicationFactor:
+         # can't lose data if not enough nodes failed
+         return 0.0
+
+      results = []
+      nodesWrap = range(numNodes) + range(numNodes)
+      for _ in range(trials):
+         lostData = False
+         failedNodes = sorted(random.sample(xrange(numNodes), numFailedNodes))
+
+         # check if Facebook strawman replication scheme could have generated
+         # any of the subsets
+         #
+         # NOTE: Facebook's scheme works by selecting the next "S" neighbors for
+         # each node as its buddies
+         failedNodesWrap = failedNodes + failedNodes
+         for i, failedNode in enumerate(failedNodes):
+            # if the next "RF - 1" nodes are within the "S" range, it means
+            # this could have been a copyset data was replicated to (which we
+            # assume means data *was* replicated to it)
+            failedNodesInReach = failedNodesWrap[i + 1 :
+                                                 i + (replicationFactor - 1) + 1]
+            buddies = nodesWrap[failedNode + 1 :
+                                failedNode + (scatterWidth + 1) + 1]
+            if set(failedNodesInReach).issubset(set(buddies)):
+               lostData = True
                break
 
          results.append(1.0 if lostData else 0.0)

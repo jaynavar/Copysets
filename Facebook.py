@@ -10,8 +10,9 @@ class FacebookScheme(Replication.ReplicationScheme):
 
 class FacebookRandomScheme(FacebookScheme):
    def probabilityOfDataLossSimulation(self, numNodes):
-      # TODO
-      return 0
+      return self.simulationFacebookRandomDataLoss(
+         self.trials, numNodes, self.chunksPerNode, self.replicationFactor,
+         self.scatterWidth)
 
    def probabilityOfDataLossComputation(self, numNodes):
       # compute the probability
