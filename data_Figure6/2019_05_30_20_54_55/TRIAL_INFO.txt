@@ -1,0 +1,8 @@
+Trial Note: N/A
+
+Trials: 100
+Simulation: False
+Sample gap: 100
+Max nodes: 2000
+
+Runtime (DD:HH:MM:SS): 00:00:00:01
