@@ -91,14 +91,15 @@ class ReplicationScheme(object):
          # can't lose data if not enough nodes failed
          return 0.0
 
+      failedCombos = scipy.misc.comb(numFailedNodes, replicationFactor)
+      totalCombos = scipy.misc.comb(numNodes, replicationFactor)
+
       results = []
       for _ in range(trials):
          lostData = False
          for _ in range(numTotalChunks):
-            # assume failed nodes are [0, #_failed_nodes)
-            if (len([n for n in random.sample(xrange(numNodes), replicationFactor)
-                     if n < numFailedNodes])
-                == replicationFactor):
+            # assume failed copysets have IDs [0, #_failed_copysets)
+            if random.randint(0, totalCombos) < failedCombos:
                lostData = True
                break
 
