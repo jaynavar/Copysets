@@ -84,7 +84,7 @@ def generateDiagram(data, groupSize=500):
          outputDataPoints(dataPoints)
       print ''
 
-def generateFigure6(data, et, simulation=False, sampleGap=1):
+def generateFigure6(data, et, simulation=False, sampleGap=1, maxNodes=10000):
    # set dimensions and title
    fig = plt.figure(figsize=(8, 5))
    fig.suptitle('Probability of data loss when 1% of the nodes fail concurrently')
@@ -104,7 +104,11 @@ def generateFigure6(data, et, simulation=False, sampleGap=1):
                color=spi.color, clip_on=spi.clip_on)
 
    # add legend
-   plt.legend(numpoints=1, handlelength=0.5, borderaxespad=1.0)
+   if maxNodes < 5000:
+      plt.legend(numpoints=1, handlelength=0.5, borderaxespad=1.0,
+                 loc='center right', fontsize='medium')
+   else:
+      plt.legend(numpoints=1, handlelength=0.5, borderaxespad=1.0)
 
    # set x-axis
    plt.xlabel('Number of nodes')
@@ -183,6 +187,7 @@ if __name__ == '__main__':
 
    if not args.no_figures:
       generateFigure6(data, et, simulation=args.simulation,
-                      sampleGap=int(args.sample_gap))
+                      sampleGap=int(args.sample_gap),
+                      maxNodes=int(args.max_nodes))
 
    et.setCleanExit()
