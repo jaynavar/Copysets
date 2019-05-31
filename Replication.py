@@ -96,12 +96,10 @@ class ReplicationScheme(object):
 
       results = []
       for _ in range(trials):
-         lostData = False
-         for _ in range(numTotalChunks):
-            # assume failed copysets have IDs [0, #_failed_copysets)
-            if random.randint(0, totalCombos) < failedCombos:
-               lostData = True
-               break
+         smallest = min([random.randint(0, totalCombos)
+                         for _ in range(numTotalChunks)])
+         # assume failed copysets have IDs [0, #_failed_copysets)
+         lostData = smallest < failedCombos
 
          results.append(1.0 if lostData else 0.0)
 
