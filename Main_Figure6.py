@@ -12,14 +12,14 @@ DEBUG = False
 RENDER_LOCAL = False
 
 RANDOM_REPLICATION_SCHEMES = [
-   # Hdfs.HdfsRandomScheme,
-   # Ramcloud.RamcloudRandomScheme,
+   Hdfs.HdfsRandomScheme,
+   Ramcloud.RamcloudRandomScheme,
    Facebook.FacebookRandomScheme,
 ]
 COPYSET_REPLICATION_SCHEMES = [
-   # Hdfs.HdfsCopysetScheme,
-   # Facebook.FacebookCopysetScheme,
-   # Ramcloud.RamcloudCopysetScheme,
+   Hdfs.HdfsCopysetScheme,
+   Facebook.FacebookCopysetScheme,
+   Ramcloud.RamcloudCopysetScheme,
 ]
 ALL_REPLICATION_SCHEMES = RANDOM_REPLICATION_SCHEMES + COPYSET_REPLICATION_SCHEMES
 SCHEME_PLOT_INFOS = [(scheme.__name__, scheme.plotInfo())
@@ -33,9 +33,6 @@ def runFigure6Experiment(rf=3, maxNodes=10000, simulation=False, trials=100,
    # gather the data from the replication schemes
    replicationKwargs = {'debug': DEBUG, 'simulation': simulation,
                         'trials': trials, 'replicationFactor': 3}
-   # currently only support copyset replication for simulations
-   # validReplicationSchemes = (ALL_REPLICATION_SCHEMES if not simulation else
-   #                            COPYSET_REPLICATION_SCHEMES)
    validReplicationSchemes = ALL_REPLICATION_SCHEMES
    replicationSchemes = [scheme(**replicationKwargs)
                          for scheme in validReplicationSchemes]
@@ -144,6 +141,8 @@ if __name__ == '__main__':
                        help='size of debug summary groups')
    parser.add_argument('--sample-gap', default='1',
                        help='gap between sampled datapoints')
+   parser.add_argument('--max-nodes', default='10000',
+                       help='maximum number of nodes')
    parser.add_argument('--simulation', action='store_true',
                        help='use simulation instead of computation')
    parser.add_argument('-t', '--trials', default='100',
@@ -167,13 +166,15 @@ if __name__ == '__main__':
       'Trials: %s' % args.trials,
       'Simulation: %r' % args.simulation,
       'Sample gap: %s' % args.sample_gap,
+      'Max nodes: %s' % args.max_nodes,
    ]
    et = ExperimentTrack('data_Figure6', trialInfo, args.save)
 
    if args.load:
       data = et.loadData(args.load)
    else:
-      data = runFigure6Experiment(simulation=args.simulation,
+      data = runFigure6Experiment(maxNodes=int(args.max_nodes),
+                                  simulation=args.simulation,
                                   trials=int(args.trials),
                                   sampleGap=int(args.sample_gap))
 
